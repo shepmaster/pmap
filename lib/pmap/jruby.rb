@@ -19,14 +19,24 @@ module PMap
   def self.included(base)
     base.module_eval do
       def peach(thread_count = nil, &proc)
-        executor(thread_count) do |executor|
-          self.each do |item|
-            executor.submit(Task.new(proc, item))
-          end
+        futures = submit_tasks(thread_count, proc)
+        pretty_java_exception do
+          futures.each {|f| f.get}
         end
+
+        self
       end
 
       def pmap(thread_count = nil, &proc)
+        futures = submit_tasks(thread_count, proc)
+        pretty_java_exception do
+          futures.map {|f| f.get}
+        end
+      end
+
+      private
+
+      def submit_tasks(thread_count, proc)
         futures = nil
 
         executor(thread_count) do |executor|
@@ -35,10 +45,21 @@ module PMap
           end
         end
 
-        futures.map {|f| f.get}
+        futures
       end
 
-      private
+      def pretty_java_exception
+        result = nil
+
+        begin
+          result = yield
+        rescue NativeException => ne
+          # Unwrap the NativeException, then the ExecutionException
+          raise ne.cause.cause
+        end
+
+        result
+      end
 
       def executor(thread_count)
         java_import java.util.concurrent.Executors

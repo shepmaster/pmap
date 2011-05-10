@@ -60,4 +60,12 @@ class Pmap_Test < Test::Unit::TestCase
     assert(elapsed >= 2, 'Limited threads too fast: %.1f seconds' % elapsed)
     assert(elapsed <  3, 'Parallel sleeps too slow: %.1f seconds' % elapsed)
   end
+
+  def test_peach_raise_exception
+    assert_raise(RuntimeError) {[1].peach { raise "hell" }}
+  end
+
+  def test_pmap_raise_exception
+    assert_raise(RuntimeError) {[1].pmap { raise "hell" }}
+  end
 end
