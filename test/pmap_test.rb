@@ -53,7 +53,7 @@ class Pmap_Test < Test::Unit::TestCase
     assert(elapsed <  3, 'Parallel sleeps too slow: %.1f seconds' % elapsed)
   end
 
-  def test_defaut_thread_limit
+  def test_default_thread_limit
     start = Time.now
     (1..128).pmap{ sleep 1 }
     elapsed = Time.now-start
