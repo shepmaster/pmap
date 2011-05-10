@@ -49,3 +49,9 @@ get_quote ranges averages 0.5 seconds.
     # This will take about half a second;
     # however long the single slowest response took.
     stock_quotes = stock_symbols.pmap {|s| get_quote(s)}
+
+JRuby
+-----
+
+When running under JRuby, pmap will use the Java Executor framework to
+handle thread creation and task scheduling.
